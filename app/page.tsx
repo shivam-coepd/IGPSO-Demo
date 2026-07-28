@@ -1158,8 +1158,10 @@ export default function Home() {
                       {div.title}
                       <ChevronDown className="w-4 h-4 transition-transform duration-300" style={{ transform: isOpen ? "rotate(180deg)" : "" }} />
                     </button>
-                    <div className={`accordion-content px-5 pb-4 ${isOpen ? "open" : ""}`}>
-                      <p className="text-xs text-navy/60">{t(div.contentHi, div.contentEn)}</p>
+                    <div className={`accordion-content ${isOpen ? "open" : ""}`}>
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-navy/60">{t(div.contentHi, div.contentEn)}</p>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1308,8 +1310,10 @@ export default function Home() {
                       <span>{t(faq.qHi, faq.qEn)}</span>
                       <ChevronDown className="w-4 h-4 transition-transform duration-300" style={{ transform: isOpen ? "rotate(180deg)" : "" }} />
                     </button>
-                    <div className={`accordion-content px-5 pb-4 ${isOpen ? "open" : ""}`}>
-                      <p className="text-xs text-navy/60">{t(faq.aHi, faq.aEn)}</p>
+                    <div className={`accordion-content ${isOpen ? "open" : ""}`}>
+                      <div className="px-5 pb-4">
+                        <p className="text-xs text-navy/60">{t(faq.aHi, faq.aEn)}</p>
+                      </div>
                     </div>
                   </div>
                 );
