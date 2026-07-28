@@ -1,10 +1,9 @@
 
-> igpso@0.1.0 dev
-> next dev
+> igpso@0.1.0 start
+> next start
 
-▲ Next.js 16.2.11 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://192.168.0.2:3000
-✓ Ready in 580ms
-
- GET / 200 in 664ms (next.js: 330ms, application-code: 334ms)
+⨯ Failed to start server
+Error: listen EADDRINUSE: address already in use :::3000
+    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
+    at new Promise (<anonymous HEAD / 200 in 707ms (next.js: 97ms, application-code: 610ms)
+ GET / 200 in 169ms (next.js: 11ms, application-code: 158ms)
