@@ -13,7 +13,6 @@ import {
   UserCheck,
   Settings,
   Trophy,
-  User,
   Users,
   Megaphone,
   Globe,
@@ -24,6 +23,16 @@ import {
   Mail,
   Edit3,
   X,
+  ArrowRight,
+  GraduationCap,
+  Target,
+  Sparkles,
+  Building2,
+  TrendingUp,
+  BookOpen,
+  Clock,
+  MapPin,
+  Send,
 } from "lucide-react";
 
 // Counter logic component
@@ -139,48 +148,16 @@ export default function Home() {
       { threshold: 0.1 }
     );
 
-    document.querySelectorAll(".fade-up").forEach((el) => fadeObserver.observe(el));
+    // Small delay to ensure DOM is updated after filter changes
+    const timer = setTimeout(() => {
+      document.querySelectorAll(".fade-up:not(.visible)").forEach((el) => fadeObserver.observe(el));
+    }, 50);
 
     return () => {
+      clearTimeout(timer);
       fadeObserver.disconnect();
     };
-  }, []);
-
-  // Scroll highlight for admission steps
-  useEffect(() => {
-    const handleScroll = () => {
-      const triggerOffset = window.innerHeight * 0.75;
-      const steps = document.querySelectorAll(".admission-step");
-      steps.forEach((step) => {
-        const rect = step.getBoundingClientRect();
-        const stepCenter = rect.top + rect.height / 2;
-        const badge = step.querySelector(".step-badge");
-        if (stepCenter < triggerOffset) {
-          step.classList.remove("opacity-60", "scale-95");
-          step.classList.add("opacity-100", "scale-100", "border-gold", "shadow-md");
-          if (badge) {
-            badge.classList.remove("bg-white", "border-navy/20", "text-navy/60");
-            badge.classList.add("bg-gold", "border-gold", "text-navy", "scale-110");
-          }
-        } else {
-          step.classList.add("opacity-60", "scale-95");
-          step.classList.remove("opacity-100", "scale-100", "border-gold", "shadow-md");
-          if (badge) {
-            badge.classList.add("bg-white", "border-navy/20", "text-navy/60");
-            badge.classList.remove("bg-gold", "border-gold", "text-navy", "scale-110");
-          }
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    const timer = setTimeout(handleScroll, 500);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      clearTimeout(timer);
-    };
-  }, []);
+  }, [moduleFilter]);
 
   const toggleLanguage = () => {
     setLang((prev) => (prev === "hi" ? "en" : "hi"));
@@ -201,7 +178,6 @@ export default function Home() {
     };
 
     try {
-      // Simulate/SDK Submission
       const sdk = (window as unknown as { dataSdk?: { create?: (rec: Record<string, unknown>) => Promise<{ isOk: boolean }> } }).dataSdk;
       if (sdk && typeof sdk.create === "function") {
         const res = await sdk.create(record);
@@ -211,14 +187,12 @@ export default function Home() {
           setModalSubmitStatus("error");
         }
       } else {
-        // Fallback success
         setModalSubmitStatus("success");
       }
     } catch {
       setModalSubmitStatus("error");
     }
 
-    // Reset status and close modal after 3 seconds on success
     setTimeout(() => {
       setEnquiryModalOpen(false);
       setModalSubmitStatus("idle");
@@ -293,20 +267,13 @@ export default function Home() {
 
   const getModuleIcon = (cat: string) => {
     switch (cat) {
-      case "career":
-        return <User className="w-5 h-5" />;
-      case "hr":
-        return <Users className="w-5 h-5" />;
-      case "marketing":
-        return <Megaphone className="w-5 h-5" />;
-      case "export":
-        return <Globe className="w-5 h-5" />;
-      case "production":
-        return <Factory className="w-5 h-5" />;
-      case "finance":
-        return <Coins className="w-5 h-5" />;
-      default:
-        return <Settings className="w-5 h-5" />;
+      case "career": return <Users className="w-5 h-5" />;
+      case "hr": return <Users className="w-5 h-5" />;
+      case "marketing": return <Megaphone className="w-5 h-5" />;
+      case "export": return <Globe className="w-5 h-5" />;
+      case "production": return <Factory className="w-5 h-5" />;
+      case "finance": return <Coins className="w-5 h-5" />;
+      default: return <Settings className="w-5 h-5" />;
     }
   };
 
@@ -324,787 +291,526 @@ export default function Home() {
   ];
 
   const faqs = [
-    {
-      qHi: "यह program किसके लिए है?",
-      qEn: "Who is this program for?",
-      aHi: "यह program graduates, postgraduates और job seekers के लिए है जो practical business skills सीखना चाहते हैं।",
-      aEn: "This program is for graduates, postgraduates and job seekers who want to learn practical business skills.",
-    },
-    {
-      qHi: "Program की अवधि कितनी है?",
-      qEn: "What is the program duration?",
-      aHi: "45 दिन का structured internship एवं business training program।",
-      aEn: "45-day structured internship and business training program.",
-    },
-    {
-      qHi: "क्या industrial visit शामिल है?",
-      qEn: "Is industrial visit included?",
-      aHi: "हाँ, schedule और availability के अनुसार industrial exposure दिया जाता है।",
-      aEn: "Yes, industrial exposure is provided subject to schedule and availability.",
-    },
-    {
-      qHi: "क्या certificate दिया जाएगा?",
-      qEn: "Will a certificate be provided?",
-      aHi: "हाँ, program पूरा होने पर internship certificate प्रदान किया जाता है।",
-      aEn: "Yes, an internship certificate is provided upon program completion.",
-    },
-    {
-      qHi: "Training Hindi या English में होगी?",
-      qEn: "Will training be in Hindi or English?",
-      aHi: "Training primarily Hindi में होती है, English communication भी सिखाई जाती है।",
-      aEn: "Training is primarily in Hindi; English communication is also taught.",
-    },
-    {
-      qHi: "Admission process क्या है?",
-      qEn: "What is the admission process?",
-      aHi: "Enquiry → Counselling → Batch confirmation → Documents → Admission → Training start",
-      aEn: "Enquiry → Counselling → Batch confirmation → Documents → Admission → Training start",
-    },
-    {
-      qHi: "क्या placement assistance उपलब्ध है?",
-      qEn: "Is placement assistance available?",
-      aHi: "संस्थान career guidance और placement-related assistance दे सकता है; employment किसी employer की selection process, vacancy, skills और candidate performance पर निर्भर करेगा।",
-      aEn: "The institute can provide career guidance and placement-related assistance; employment depends on employer selection process, vacancy, skills and candidate performance.",
-    },
-    {
-      qHi: "Fees और batch timings कैसे जानें?",
-      qEn: "How to know fees and batch timings?",
-      aHi: "Enquiry form भरें या counsellor से संपर्क करें।",
-      aEn: "Fill the enquiry form or contact the counsellor.",
-    },
-    {
-      qHi: "क्या बाहर के विद्यार्थी apply कर सकते हैं?",
-      qEn: "Can outstation students apply?",
-      aHi: "हाँ, किसी भी शहर के students apply कर सकते हैं।",
-      aEn: "Yes, students from any city can apply.",
-    },
+    { qHi: "यह program किसके लिए है?", qEn: "Who is this program for?", aHi: "यह program graduates, postgraduates और job seekers के लिए है जो practical business skills सीखना चाहते हैं।", aEn: "This program is for graduates, postgraduates and job seekers who want to learn practical business skills." },
+    { qHi: "Program की अवधि कितनी है?", qEn: "What is the program duration?", aHi: "45 दिन का structured internship एवं business training program।", aEn: "45-day structured internship and business training program." },
+    { qHi: "क्या industrial visit शामिल है?", qEn: "Is industrial visit included?", aHi: "हाँ, schedule और availability के अनुसार industrial exposure दिया जाता है।", aEn: "Yes, industrial exposure is provided subject to schedule and availability." },
+    { qHi: "क्या certificate दिया जाएगा?", qEn: "Will a certificate be provided?", aHi: "हाँ, program पूरा होने पर internship certificate प्रदान किया जाता है।", aEn: "Yes, an internship certificate is provided upon program completion." },
+    { qHi: "Training Hindi या English में होगी?", qEn: "Will training be in Hindi or English?", aHi: "Training primarily Hindi में होती है, English communication भी सिखाई जाती है।", aEn: "Training is primarily in Hindi; English communication is also taught." },
+    { qHi: "Admission process क्या है?", qEn: "What is the admission process?", aHi: "Enquiry → Counselling → Batch confirmation → Documents → Admission → Training start", aEn: "Enquiry → Counselling → Batch confirmation → Documents → Admission → Training start" },
+    { qHi: "क्या placement assistance उपलब्ध है?", qEn: "Is placement assistance available?", aHi: "संस्थान career guidance और placement-related assistance दे सकता है; employment किसी employer की selection process, vacancy, skills और candidate performance पर निर्भर करेगा।", aEn: "The institute can provide career guidance and placement-related assistance; employment depends on employer selection process, vacancy, skills and candidate performance." },
+    { qHi: "Fees और batch timings कैसे जानें?", qEn: "How to know fees and batch timings?", aHi: "Enquiry form भरें या counsellor से संपर्क करें।", aEn: "Fill the enquiry form or contact the counsellor." },
+    { qHi: "क्या बाहर के विद्यार्थी apply कर सकते हैं?", qEn: "Can outstation students apply?", aHi: "हाँ, किसी भी शहर के students apply कर सकते हैं।", aEn: "Yes, students from any city can apply." },
   ];
 
   return (
-    <div className={`min-h-screen bg-ivory text-navy ${lang === "en" ? "lang-en" : ""}`}>
-      {/* Header */}
+    <div className={`min-h-screen ${lang === "en" ? "lang-en" : ""}`} style={{ backgroundColor: '#FAFAFA', color: '#0A1628' }}>
+      {/* Skip Link */}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
+      {/* Premium Header */}
       <header
         id="site-header"
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? "header-solid" : ""}`}
-        style={{
-          background: scrolled ? "#071B3F" : "rgba(7,27,63,0.08)",
-          backdropFilter: scrolled ? "none" : "blur(10px)",
-        }}
+        className={`header ${scrolled ? "header-solid" : "header-transparent"}`}
       >
-        <nav className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gold flex items-center justify-center font-heading font-bold text-navy text-sm shadow-md">
-              IG
+        <div className="container">
+          <nav className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <a href="#home" className="logo">
+              <div className="logo-icon">IG</div>
+              <span className="logo-text hidden sm:block">IGPSO</span>
+            </a>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-8">
+              <a href="#home" className="nav-link">{t("होम", "Home")}</a>
+              <a href="#about" className="nav-link">{t("परिचय", "About")}</a>
+              <a href="#program" className="nav-link">{t("45-दिवसीय प्रोग्राम", "45-Day Program")}</a>
+              <a href="#modules" className="nav-link">{t("मॉड्यूल", "Modules")}</a>
+              <a href="#industrial" className="nav-link">{t("औद्योगिक अनुभव", "Industrial")}</a>
+              <a href="#projects" className="nav-link">{t("प्रोजेक्ट्स", "Projects")}</a>
+              <a href="#admissions" className="nav-link">{t("प्रवेश", "Admissions")}</a>
+              <a href="#contact" className="nav-link">{t("संपर्क", "Contact")}</a>
             </div>
-            <span className="font-heading font-bold text-white text-sm hidden sm:block tracking-wide">IGPSO</span>
-          </div>
 
-          <div className="hidden lg:flex items-center gap-6">
-            <a href="#home" className="nav-link text-white text-sm font-medium">
-              {t("होम", "Home")}
-            </a>
-            <a href="#about" className="nav-link text-white text-sm font-medium">
-              {t("परिचय", "About")}
-            </a>
-            <a href="#program" className="nav-link text-white text-sm font-medium">
-              {t("45-दिवसीय प्रोग्राम", "45-Day Program")}
-            </a>
-            <a href="#modules" className="nav-link text-white text-sm font-medium">
-              {t("मॉड्यूल", "Modules")}
-            </a>
-            <a href="#industrial" className="nav-link text-white text-sm font-medium">
-              {t("औद्योगिक अनुभव", "Industrial")}
-            </a>
-            <a href="#projects" className="nav-link text-white text-sm font-medium">
-              {t("प्रोजेक्ट्स", "Projects")}
-            </a>
-            <a href="#admissions" className="nav-link text-white text-sm font-medium">
-              {t("प्रवेश", "Admissions")}
-            </a>
-            <a href="#contact" className="nav-link text-white text-sm font-medium">
-              {t("संपर्क", "Contact")}
-            </a>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleLanguage}
-              className="text-white text-xs font-semibold border border-gold/50 rounded-full px-3 py-1 hover:bg-gold hover:text-navy transition-all duration-300"
-            >
-              हि | En
-            </button>
-            <button
-              onClick={() => setEnquiryModalOpen(true)}
-              className="hidden sm:inline-block bg-gold text-navy font-heading font-bold text-sm px-4 py-2 rounded-full hover:bg-yellow-400 transition-all duration-300 gold-glow"
-            >
-              Apply Now
-            </button>
-            <button onClick={() => setMobileMenuOpen((prev) => !prev)} className="lg:hidden text-white" aria-label="Toggle menu">
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
-        </nav>
-
-        {/* Mobile Menu */}
-        <div className={`lg:hidden bg-navy/95 backdrop-blur-lg px-4 pb-4 ${mobileMenuOpen ? "" : "hidden"}`}>
-          <a href="#home" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("होम", "Home")}
-          </a>
-          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("परिचय", "About")}
-          </a>
-          <a href="#program" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("45-दिवसीय प्रोग्राम", "45-Day Program")}
-          </a>
-          <a href="#modules" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("मॉड्यूल", "Modules")}
-          </a>
-          <a href="#industrial" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("औद्योगिक अनुभव", "Industrial")}
-          </a>
-          <a href="#projects" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("प्रोजेक्ट्स", "Projects")}
-          </a>
-          <a href="#admissions" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm border-b border-white/10">
-            {t("प्रवेश", "Admissions")}
-          </a>
-          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white text-sm">
-            {t("संपर्क", "Contact")}
-          </a>
+            {/* Header Actions */}
+            <div className="flex items-center gap-4">
+              <button onClick={toggleLanguage} className="lang-toggle">
+                हि | En
+              </button>
+              <button
+                onClick={() => setEnquiryModalOpen(true)}
+                className="btn btn-primary hidden sm:flex"
+              >
+                Apply Now <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden text-white p-2"
+                aria-label="Toggle menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
+          </nav>
         </div>
       </header>
 
-      <main>
-        {/* Hero Section */}
-        <section id="home" className="relative w-full overflow-hidden" style={{ height: "calc(100 * min(var(--vh, 1vh), 1vh))", minHeight: "100vh" }}>
-          <div className="absolute inset-0">
+      {/* Mobile Menu */}
+      <div className={`mobile-menu ${mobileMenuOpen ? "open" : ""}`}>
+        <button
+          onClick={() => setMobileMenuOpen(false)}
+          className="absolute top-6 right-6 text-white p-2"
+          aria-label="Close menu"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <a href="#home" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("होम", "Home")}</a>
+        <a href="#about" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("परिचय", "About")}</a>
+        <a href="#program" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("45-दिवसीय प्रोग्राम", "45-Day Program")}</a>
+        <a href="#modules" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("मॉड्यूल", "Modules")}</a>
+        <a href="#industrial" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("औद्योगिक अनुभव", "Industrial")}</a>
+        <a href="#projects" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("प्रोजेक्ट्स", "Projects")}</a>
+        <a href="#admissions" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("प्रवेश", "Admissions")}</a>
+        <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="mobile-menu-link">{t("संपर्क", "Contact")}</a>
+        <div className="mt-8">
+          <button onClick={() => { setMobileMenuOpen(false); setEnquiryModalOpen(true); }} className="btn btn-primary w-full">
+            Apply Now <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <main id="main-content">
+        {/* Premium Hero Section */}
+        <section id="home" className="hero">
+          <div className="hero-bg">
             <div className={`hero-slide ${activeSlide === 0 ? "active" : ""}`}>
-              <img
-                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1200"
-                alt="Business training"
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
+              <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1920" alt="Business training" loading="eager" />
             </div>
             <div className={`hero-slide ${activeSlide === 1 ? "active" : ""}`}>
-              <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1200"
-                alt="Student seminar"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1920" alt="Student seminar" loading="lazy" />
             </div>
             <div className={`hero-slide ${activeSlide === 2 ? "active" : ""}`}>
-              <img
-                src="https://images.unsplash.com/photo-1542744094-3a31f103e35f?auto=format&fit=crop&q=80&w=1200"
-                alt="Practical exposure"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+              <img src="https://images.unsplash.com/photo-1542744094-3a31f103e35f?auto=format&fit=crop&q=80&w=1920" alt="Practical exposure" loading="lazy" />
             </div>
           </div>
+          <div className="hero-overlay"></div>
+          <div className="hero-pattern"></div>
 
-          <div className="absolute inset-0 bg-gradient-to-b from-navy/85 via-navy/60 to-navy/95"></div>
-          {/* Decorative grid overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          ></div>
-
-          <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4 max-w-5xl mx-auto pt-20">
-            <div className="flex items-center gap-2 mb-5">
-              <div className="pulse-dot"></div>
-              <p className="text-gold font-heading font-semibold text-sm md:text-base tracking-wide">
+          <div className="hero-content">
+            <div className="hero-overline fade-up">
+              <span className="hero-badge"></span>
+              <span className="text-overline" style={{ color: '#E8D48A' }}>
                 {t("45-दिवसीय व्यावहारिक व्यावसायिक प्रशिक्षण एवं इंटर्नशिप", "45-DAY BUSINESS TRAINING & INTERNSHIP")}
-              </p>
+              </span>
             </div>
 
-            <h1 className="font-hindi font-bold text-white text-2xl md:text-4xl lg:text-5xl leading-tight mb-3">
+            <h1 className="text-hero hero-title fade-up delay-1">
               {t("क्लासरूम और कॉर्पोरेट जगत के बीच की दूरी को मिटाएं", "Bridge the Gap Between Classroom and Corporate World")}
             </h1>
 
-            <p className="text-white/85 text-sm md:text-base max-w-3xl mb-8 font-hindi leading-relaxed">
+            <p className="hero-subtitle fade-up delay-2">
               {t(
                 "IGPSO इंदौर के साथ कम्युनिकेशन, एचआर, मार्केटिंग, एक्सपोर्ट, प्रोडक्शन और लॉजिस्टिक्स में व्यावहारिक अनुभव प्राप्त करें। जॉब मार्केट में सफल होने के लिए तैयार रहें।",
                 "Gain practical experience in Communication, HR, Marketing, Export, Production, and Logistics with IGPSO Indore. Get ready to stand out in the job market."
               )}
             </p>
 
-            <div className="flex flex-wrap gap-4 justify-center mb-8">
-              <button
-                onClick={() => setEnquiryModalOpen(true)}
-                className="bg-gold text-navy font-heading font-bold px-7 py-3.5 rounded-full text-sm md:text-base hover:bg-yellow-400 transition-all duration-300 gold-glow shadow-lg"
-              >
-                {t("अभी आवेदन करें", "Apply Now")}
+            <div className="hero-buttons fade-up delay-3">
+              <button onClick={() => setEnquiryModalOpen(true)} className="btn btn-primary btn-lg">
+                {t("अभी आवेदन करें", "Apply Now")} <ArrowRight className="w-5 h-5" />
               </button>
-              <a
-                href="#program"
-                className="border-2 border-white/80 text-white font-heading font-semibold px-7 py-3.5 rounded-full text-sm md:text-base hover:bg-white hover:text-navy transition-all duration-300"
-              >
+              <a href="#program" className="btn btn-secondary btn-lg">
                 {t("प्रोग्राम जानें", "Explore Program")}
               </a>
             </div>
 
-            <div className="flex flex-wrap gap-3 justify-center">
-              <span className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-white text-xs font-medium flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 opacity-70" />
+            <div className="hero-tags fade-up delay-4">
+              <span className="hero-tag">
+                <Calendar className="w-4 h-4" />
                 {t("45 दिन Practical Training", "45 Days Practical Training")}
               </span>
-              <span className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-white text-xs font-medium flex items-center gap-2">
-                <Factory className="w-3.5 h-3.5 opacity-70" />
+              <span className="hero-tag">
+                <Factory className="w-4 h-4" />
                 {t("Industrial Exposure", "Industrial Exposure")}
               </span>
-              <span className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-white text-xs font-medium flex items-center gap-2">
-                <Award className="w-3.5 h-3.5 opacity-70" />
+              <span className="hero-tag">
+                <Award className="w-4 h-4" />
                 {t("Internship Certificate", "Internship Certificate")}
               </span>
             </div>
+          </div>
 
-            <div className="scroll-indicator absolute bottom-8">
-              <ChevronsDown className="w-7 h-7 text-white animate-bounce" />
-            </div>
+          <div className="scroll-indicator">
+            <ChevronsDown className="w-8 h-8 text-white" />
           </div>
         </section>
 
-        {/* Trust Strip */}
-        <section className="py-14 relative">
-          <div className="absolute top-0 left-0 right-0 section-divider"></div>
-          <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
-            <div className="fade-up">
-              <p className="text-4xl font-heading font-bold text-gradient counter-target" data-id="days">
-                <CounterItem target={45} isTriggered={!!triggeredCounters["days"]} />
-              </p>
-              <p className="text-xs text-navy/70 mt-1 font-medium">{t("दिन Training", "Days Training")}</p>
+        {/* Premium Trust Strip */}
+        <section className="section-sm" style={{ backgroundColor: 'white' }}>
+          <div className="container">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
+              <div className="fade-up">
+                <p className="stat-number">
+                  <CounterItem target={45} isTriggered={!!triggeredCounters["days"]} />
+                </p>
+                <p className="stat-label">{t("दिन Training", "Days Training")}</p>
+              </div>
+              <div className="fade-up delay-1">
+                <p className="stat-number">
+                  40< span style={{ fontSize: '1.5rem' }}>+</span>
+                </p>
+                <p className="stat-label">{t("40+ Business Topics", "40+ Business Topics")}</p>
+              </div>
+              <div className="fade-up delay-2">
+                <p className="stat-number">
+                  <Check className="w-10 h-10" style={{ color: '#C9A227' }} />
+                </p>
+                <p className="stat-label">{t("Industrial Exposure", "Industrial Exposure")}</p>
+              </div>
+              <div className="fade-up delay-3">
+                <p className="stat-number">
+                  <CounterItem target={10} isTriggered={!!triggeredCounters["concepts"]} />
+                </p>
+                <p className="stat-label">{t("Smart City Concepts", "Smart City Concepts")}</p>
+              </div>
+              <div className="fade-up delay-4">
+                <p className="stat-number">25+</p>
+                <p className="stat-label">{t("शहरों का विज़न", "Cities Vision")}</p>
+              </div>
             </div>
-            <div className="fade-up">
-              <p className="text-4xl font-heading font-bold text-gradient counter-target" data-id="topics">
-                <CounterItem target={40} isTriggered={!!triggeredCounters["topics"]} />+
-              </p>
-              <p className="text-xs text-navy/70 mt-1 font-medium">{t("40+ Business Topics", "40+ Business Topics")}</p>
-            </div>
-            <div className="fade-up">
-              <p className="text-4xl font-heading font-bold text-gradient">✓</p>
-              <p className="text-xs text-navy/70 mt-1 font-medium">{t("Industrial Exposure", "Industrial Exposure")}</p>
-            </div>
-            <div className="fade-up">
-              <p className="text-4xl font-heading font-bold text-gradient counter-target" data-id="concepts">
-                <CounterItem target={10} isTriggered={!!triggeredCounters["concepts"]} />
-              </p>
-              <p className="text-xs text-navy/70 mt-1 font-medium">{t("Smart City Concepts", "Smart City Concepts")}</p>
-            </div>
-            <div className="fade-up">
-              <p className="text-4xl font-heading font-bold text-gradient">25+</p>
-              <p className="text-xs text-navy/70 mt-1 font-medium">{t("शहरों का विज़न", "Cities Vision")}</p>
-            </div>
+            <p className="text-center text-sm mt-8" style={{ color: 'rgba(10, 22, 40, 0.4)' }}>
+              {t("Expansion figures represent the organization's stated future vision.", "Expansion figures represent the organization's stated future vision.")}
+            </p>
           </div>
-          <p className="text-center text-[10px] text-navy/40 mt-4 px-4">
-            {t(
-              "Expansion figures represent the organization's stated future vision.",
-              "Expansion figures represent the organization's stated future vision."
-            )}
-          </p>
         </section>
 
         {/* About Section */}
-        <section id="about" className="py-20 bg-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center relative z-10">
-            <div className="fade-up rounded-3xl overflow-hidden shadow-2xl shadow-navy/10">
-              <img
-                src="https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&q=80&w=600"
-                alt="About IGPSO"
-                className="w-full h-72 md:h-96 object-cover"
-                loading="lazy"
-              />
-            </div>
-            <div className="fade-up">
-              <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl mb-4">
-                {t("IGPSO इंदौर के बारे में", "About IGPSO Indore")}
-              </h2>
-              <p className="text-navy/75 text-sm leading-relaxed mb-4">
-                {t(
-                  "IGPSO (International Government & Public Supportive Organization) skill development, practical business education, social development और employment readiness की दिशा में कार्य करता है। यह संस्थान युवाओं को practical business training के माध्यम से career-ready बनाने का प्रयास करता है।",
-                  "IGPSO (International Government & Public Supportive Organization) works toward skill development, practical business education, social development and employment readiness. The institution strives to make youth career-ready through practical business training."
-                )}
-              </p>
-              <p className="text-xs text-navy/50 mb-3">Registration No.: C/1077232</p>
-              <p className="font-hindi font-semibold text-gold text-sm italic">
-                {"\"सबका साथ • सबका विकास • सबका विश्वास\""}
-              </p>
+        <section id="about" className="section" style={{ backgroundColor: '#F8F6F0' }}>
+          <div className="container">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="fade-up">
+                <div className="img-premium" style={{ aspectRatio: '4/3' }}>
+                  <img src="https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&q=80&w=800" alt="About IGPSO" loading="lazy" />
+                </div>
+              </div>
+              <div className="fade-up delay-1">
+                <span className="section-overline">
+                  <Sparkles className="w-4 h-4" />
+                  {t("हमारे बारे में", "About Us")}
+                </span>
+                <h2 className="text-section-title mb-6">
+                  {t("IGPSO इंदौर के बारे में", "About IGPSO Indore")}
+                </h2>
+                <p className="text-body mb-6" style={{ color: '#475569' }}>
+                  {t(
+                    "IGPSO (International Government & Public Supportive Organization) skill development, practical business education, social development और employment readiness की दिशा में कार्य करता है। यह संस्थान युवाओं को practical business training के माध्यम से career-ready बनाने का प्रयास करता है।",
+                    "IGPSO (International Government & Public Supportive Organization) works toward skill development, practical business education, social development and employment readiness. The institution strives to make youth career-ready through practical business training."
+                  )}
+                </p>
+                <p className="text-sm mb-6" style={{ color: 'rgba(10, 22, 40, 0.5)' }}>Registration No.: C/1077232</p>
+                <div className="p-6 rounded-2xl" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)', borderLeft: '4px solid #C9A227' }}>
+                  <p className="hindi-text text-lg font-semibold" style={{ color: '#9A7B1A' }}>
+                    "सबका साथ • सबका विकास • सबका विश्वास"
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Chairman Message */}
-        <section className="py-16 relative">
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="fade-up bg-white rounded-3xl p-8 md:p-12 border border-gold/10 shadow-lg shadow-navy/5 flex flex-col md:flex-row gap-8 items-center">
-              <div className="shrink-0">
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-gold/30 shadow-lg">
-                  <img
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
-                    alt="Chairman"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+        <section className="section-sm" style={{ backgroundColor: 'white' }}>
+          <div className="container-sm">
+            <div className="quote-card fade-up">
+              <div className="flex flex-col md:flex-row gap-8 items-center">
+                <div className="quote-avatar shrink-0">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" alt="Chairman" />
                 </div>
-              </div>
-              <div className="flex-1 text-center md:text-left">
-                <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
-                  <Quote className="w-5 h-5 text-gold" />
-                  <span className="text-xs font-heading font-bold text-gold uppercase tracking-wider">
-                    {t("Chairman's Message", "Chairman's Message")}
-                  </span>
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Quote className="w-6 h-6" style={{ color: '#C9A227' }} />
+                    <span className="text-overline" style={{ color: '#C9A227' }}>
+                      {t("Chairman's Message", "Chairman's Message")}
+                    </span>
+                  </div>
+                  <p className="text-lg mb-4 italic" style={{ color: '#475569', lineHeight: '1.8' }}>
+                    {t(
+                      "\"हमारा उद्देश्य है कि प्रत्येक विद्यार्थी को व्यावहारिक business knowledge दी जाए ताकि वे industry-ready बनें। किताबी ज्ञान के साथ-साथ practical exposure ही सफलता की कुंजी है।\"",
+                      "\"Our aim is to provide every student with practical business knowledge so they become industry-ready. Along with theoretical knowledge, practical exposure is the key to success.\""
+                    )}
+                  </p>
+                  <p className="font-heading font-bold" style={{ color: '#0A1628' }}>
+                    — {t("IGPSO संस्थापक", "IGPSO Founder")}
+                  </p>
                 </div>
-                <p className="text-navy/80 text-sm md:text-base leading-relaxed italic mb-3">
-                  {t(
-                    "\"हमारा उद्देश्य है कि प्रत्येक विद्यार्थी को व्यावहारिक business knowledge दी जाए ताकि वे industry-ready बनें। किताबी ज्ञान के साथ-साथ practical exposure ही सफलता की कुंजी है।\"",
-                    "\"Our aim is to provide every student with practical business knowledge so they become industry-ready. Along with theoretical knowledge, practical exposure is the key to success.\""
-                  )}
-                </p>
-                <p className="font-heading font-bold text-navy text-sm">— {t("IGPSO संस्थापक", "IGPSO Founder")}</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* Why This Program */}
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-3 fade-up">
-              {t("यह Program क्यों चुनें?", "Why This Program?")}
-            </h2>
-            <p className="text-navy/60 text-sm text-center mb-10 max-w-2xl mx-auto">
-              {t("Practical skills जो आपको job market में अलग बनाएं", "Practical skills that set you apart in the job market")}
-            </p>
+        <section className="section" style={{ backgroundColor: '#FAFAFA' }}>
+          <div className="container">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <Target className="w-4 h-4" />
+                {t("हमारी विशेषताएं", "Why Choose Us")}
+              </span>
+              <h2 className="text-section-title">{t("यह Program क्यों चुनें?", "Why This Program?")}</h2>
+              <p className="section-subtitle">
+                {t("Practical skills जो आपको job market में अलग बनाएं", "Practical skills that set you apart in the job market")}
+              </p>
+            </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <Briefcase className="w-5 h-5 text-gold" />
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { icon: Briefcase, titleHi: "व्यावहारिक व्यावसायिक समझ", titleEn: "Practical Business Understanding", descHi: "वास्तविक व्यावसायिक प्रक्रियाओं की व्यावहारिक समझ", descEn: "Hands-on understanding of real business processes" },
+                { icon: Mic, titleHi: "व्यावसायिक संचार", titleEn: "Professional Communication", descHi: "कॉर्पोरेट स्तर के संचार कौशल", descEn: "Corporate-level communication skills" },
+                { icon: UserCheck, titleHi: "इंटरव्यू की तैयारी", titleEn: "Interview Readiness", descHi: "इंटरव्यू और कार्यस्थल के लिए सम्पूर्ण तैयारी", descEn: "Complete preparation for interviews and workplace" },
+                { icon: Factory, titleHi: "औद्योगिक अनुभव", titleEn: "Industrial Exposure", descHi: "वास्तविक औद्योगिक परिवेश में सीधा अनुभव", descEn: "Direct exposure in real industry environments" },
+                { icon: Settings, titleHi: "व्यवसाय प्रक्रिया ज्ञान", titleEn: "Business Process Knowledge", descHi: "एचआर, मार्केटिंग, एक्सपोर्ट और प्रोडक्शन की पूर्ण जानकारी", descEn: "Complete knowledge of HR, Marketing, Export, Production" },
+                { icon: Award, titleHi: "इंटर्नशिप प्रमाण पत्र", titleEn: "Internship Certificate", descHi: "प्रोग्राम सफलतापूर्वक पूरा होने पर प्रमाण पत्र", descEn: "Certificate upon successful program completion" },
+              ].map((item, idx) => (
+                <div key={idx} className="card fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                  <div className="card-body">
+                    <div className="card-icon mb-4">
+                      <item.icon className="w-7 h-7" style={{ color: '#C9A227' }} />
+                    </div>
+                    <h3 className="text-card-title mb-2">{t(item.titleHi, item.titleEn)}</h3>
+                    <p className="text-caption" style={{ color: '#64748B' }}>{t(item.descHi, item.descEn)}</p>
                   </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("व्यावहारिक व्यावसायिक समझ", "Practical Business Understanding")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("वास्तविक व्यावसायिक प्रक्रियाओं की व्यावहारिक समझ", "Hands-on understanding of real business processes")}
-                  </p>
                 </div>
-              </div>
-
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <Mic className="w-5 h-5 text-gold" />
-                  </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("व्यावसायिक संचार", "Professional Communication")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("कॉर्पोरेट स्तर के संचार कौशल (Communication Skills)", "Corporate-level communication skills")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <UserCheck className="w-5 h-5 text-gold" />
-                  </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("इंटरव्यू की तैयारी", "Interview Readiness")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("इंटरव्यू और कार्यस्थल (Workplace) के लिए सम्पूर्ण तैयारी", "Complete preparation for interviews and workplace")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <Factory className="w-5 h-5 text-gold" />
-                  </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("औद्योगिक अनुभव (Industrial Exposure)", "Industrial Exposure")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("वास्तविक औद्योगिक परिवेश में सीधा अनुभव", "Direct exposure in real industry environments")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <Settings className="w-5 h-5 text-gold" />
-                  </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("व्यवसाय प्रक्रिया ज्ञान", "Business Process Knowledge")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("एचआर (HR), मार्केटिंग, एक्सपोर्ट और प्रोडक्शन की पूर्ण जानकारी", "Complete knowledge of HR, Marketing, Export, Production")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="card-hover fade-up bg-white rounded-3xl p-6 border border-gold/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10">
-                  <div className="w-12 h-12 bg-gold/10 rounded-xl flex items-center justify-center mb-4">
-                    <Award className="w-5 h-5 text-gold" />
-                  </div>
-                  <h3 className="font-heading font-bold text-navy text-sm mb-2">
-                    {t("इंटर्नशिप प्रमाण पत्र", "Internship Certificate")}
-                  </h3>
-                  <p className="text-xs text-navy/60 leading-relaxed">
-                    {t("प्रोग्राम सफलतापूर्वक पूरा होने पर प्रमाण पत्र", "Certificate upon successful program completion")}
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* 45-Day Program Timeline */}
-        <section id="program" className="py-20 bg-navy relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle at 2px 2px, rgba(213,165,42,0.3) 1px, transparent 0)",
-              backgroundSize: "40px 40px",
-            }}
-          ></div>
-          <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <h2 className="font-heading font-bold text-white text-2xl md:text-3xl text-center mb-3 fade-up">
-              {t("45-Day Program Journey", "45-Day Program Journey")}
-            </h2>
-            <p className="text-white/60 text-sm text-center mb-12">
-              {t("Structured training जो आपको career-ready बनाए", "Structured training to make you career-ready")}
-            </p>
+        <section id="program" className="section section-dark relative overflow-hidden">
+          <div className="bg-pattern-dots"></div>
+          <div className="container relative z-10">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <GraduationCap className="w-4 h-4" />
+                {t("प्रोग्राम संरचना", "Program Structure")}
+              </span>
+              <h2 className="text-section-title">{t("45-Day Program Journey", "45-Day Program Journey")}</h2>
+              <p className="section-subtitle">
+                {t("Structured training जो आपको career-ready बनाए", "Structured training to make you career-ready")}
+              </p>
+            </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">1</span> Week 1
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("व्यक्तित्व और व्यावसायिक संचार", "Personality & Professional Communication")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">2</span> Week 2
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("एचआर (HR), इंटरव्यू और ऑफिस Management", "HR, Interview & Office Management")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">3</span> Week 3
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("मार्केटिंग, सेल्स और कस्टमर रिलेशंस", "Marketing, Sales & Customer Relations")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">4</span> Week 4
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("एक्सपोर्ट, पूछताछ, कोटेशन और ऑर्डर", "Export, Enquiry, Quotation & Order")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">5</span> Week 5
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("पर्चेस, प्रोडक्शन, क्वालिटी और लॉजिस्टिक्स", "Purchase, Production, Quality & Logistics")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 hover:bg-white/10 hover:border-gold/30 transition-all duration-300">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gold/20 rounded-full flex items-center justify-center text-[10px]">6</span> Week 6
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("बिलिंग, डॉक्यूमेंटेशन और व्यावसायिक अभ्यास", "Billing, Documentation & Business Practice")}
-                </h4>
-              </div>
-
-              <div className="fade-up bg-gold/15 border border-gold/30 rounded-2xl p-5 sm:col-span-2">
-                <p className="text-gold font-heading font-bold text-xs mb-2 flex items-center gap-2">
-                  <Trophy className="w-3.5 h-3.5" />
-                  {t("अंतिम दिन", "Final Days")}
-                </p>
-                <h4 className="text-white font-semibold text-sm">
-                  {t("औद्योगिक अनुभव, समीक्षा और प्रमाणन", "Industrial Exposure, Review & Certification")}
-                </h4>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {[
+                { week: 1, titleHi: "व्यक्तित्व और व्यावसायिक संचार", titleEn: "Personality & Professional Communication" },
+                { week: 2, titleHi: "एचआर, इंटरव्यू और ऑफिस Management", titleEn: "HR, Interview & Office Management" },
+                { week: 3, titleHi: "मार्केटिंग, सेल्स और कस्टमर रिलेशंस", titleEn: "Marketing, Sales & Customer Relations" },
+                { week: 4, titleHi: "एक्सपोर्ट, पूछताछ, कोटेशन और ऑर्डर", titleEn: "Export, Enquiry, Quotation & Order" },
+                { week: 5, titleHi: "पर्चेस, प्रोडक्शन, क्वालिटी और लॉजिस्टिक्स", titleEn: "Purchase, Production, Quality & Logistics" },
+                { week: 6, titleHi: "बिलिंग, डॉक्यूमेंटेशन और व्यावसायिक अभ्यास", titleEn: "Billing, Documentation & Business Practice" },
+              ].map((item, idx) => (
+                <div key={idx} className="card-dark rounded-2xl p-6 fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="w-10 h-10 rounded-xl flex items-center justify-center font-bold" style={{ backgroundColor: 'rgba(201, 162, 39, 0.2)', color: '#C9A227' }}>
+                      {item.week}
+                    </span>
+                    <span className="text-sm font-semibold" style={{ color: '#C9A227' }}>Week {item.week}</span>
+                  </div>
+                  <h4 className="text-white font-semibold">{t(item.titleHi, item.titleEn)}</h4>
+                </div>
+              ))}
+              
+              {/* Final Days Card */}
+              <div className="card-dark rounded-2xl p-6 sm:col-span-2 fade-up" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)', borderColor: 'rgba(201, 162, 39, 0.3)' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <Trophy className="w-6 h-6" style={{ color: '#C9A227' }} />
+                  <span className="text-sm font-semibold" style={{ color: '#C9A227' }}>{t("अंतिम दिन", "Final Days")}</span>
+                </div>
+                <h4 className="text-white font-semibold">{t("औद्योगिक अनुभव, समीक्षा और प्रमाणन", "Industrial Exposure, Review & Certification")}</h4>
               </div>
             </div>
           </div>
         </section>
 
         {/* Training Modules */}
-        <section id="modules" className="py-20">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-3 fade-up">
-              {t("Training Modules", "Training Modules")}
-            </h2>
-            <p className="text-navy/60 text-sm text-center mb-8">
-              {t("विभिन्न business areas की practical training", "Practical training across business areas")}
-            </p>
+        <section id="modules" className="section" style={{ backgroundColor: 'white' }}>
+          <div className="container">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <BookOpen className="w-4 h-4" />
+                {t("प्रशिक्षण मॉड्यूल", "Training Modules")}
+              </span>
+              <h2 className="text-section-title">{t("Comprehensive Learning Modules", "Comprehensive Learning Modules")}</h2>
+              <p className="section-subtitle">
+                {t("विभिन्न business areas की practical training", "Practical training across business areas")}
+              </p>
+            </div>
 
-            <div className="flex flex-wrap gap-2 justify-center mb-8">
-              {["all", "career", "hr", "marketing", "export", "production", "finance"].map((cat) => (
+            <div className="flex flex-wrap gap-3 justify-center mb-10 fade-up">
+              {[
+                { key: "all", labelHi: "सभी", labelEn: "All" },
+                { key: "career", labelHi: "Career", labelEn: "Career" },
+                { key: "hr", labelHi: "HR", labelEn: "HR" },
+                { key: "marketing", labelHi: "Marketing", labelEn: "Marketing" },
+                { key: "export", labelHi: "Export", labelEn: "Export" },
+                { key: "production", labelHi: "Production", labelEn: "Production" },
+                { key: "finance", labelHi: "Finance", labelEn: "Finance" },
+              ].map((item) => (
                 <button
-                  key={cat}
-                  onClick={() => setModuleFilter(cat)}
-                  className={`text-xs font-semibold px-4 py-2 rounded-full transition-all duration-300 ${
-                    moduleFilter === cat
-                      ? "bg-navy text-white"
-                      : "bg-navy/5 text-navy hover:bg-navy/10"
-                  }`}
+                  key={item.key}
+                  onClick={() => setModuleFilter(item.key)}
+                  className={`tag ${moduleFilter === item.key ? "tag-active" : ""}`}
                 >
-                  {cat === "all" ? t("सभी", "All") : cat.toUpperCase()}
+                  {t(item.labelHi, item.labelEn)}
                 </button>
               ))}
             </div>
 
-            <div id="modules-grid" className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filteredModules.map((m, index) => {
-                const meta = catMeta[m.cat] || { color: "text-navy bg-white border-navy/10" };
-                return (
-                  <div
-                    key={index}
-                    className="module-card-enter group bg-white rounded-2xl p-5 border border-navy/10 shadow-sm hover:shadow-lg hover:border-gold/30 transition-all duration-300 flex items-start gap-4"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${meta.color} transition-transform group-hover:scale-110 duration-300`}
-                    >
-                      {getModuleIcon(m.cat)}
+            <div key={moduleFilter} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredModules.length > 0 ? (
+                filteredModules.map((m, index) => {
+                  const meta = catMeta[m.cat] || { color: "text-navy bg-white border-navy/10" };
+                  return (
+                    <div key={`${m.cat}-${index}`} className="card fade-up" style={{ animationDelay: `${index * 0.03}s` }}>
+                      <div className="card-body flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border ${meta.color}`}>
+                          {getModuleIcon(m.cat)}
+                        </div>
+                        <div>
+                          <span className={`inline-block text-xs font-bold uppercase tracking-wider mb-1 ${meta.color.split(" ")[0]}`}>
+                            {m.cat}
+                          </span>
+                          <h4 className="font-semibold" style={{ color: '#0A1628' }}>{t(m.hi, m.en)}</h4>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className={`inline-block text-[10px] font-bold uppercase tracking-wider mb-1 ${meta.color.split(" ")[0]}`}>
-                        {m.cat}
-                      </span>
-                      <h4 className="text-sm font-bold text-navy leading-snug">
-                        {t(m.hi, m.en)}
-                      </h4>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="col-span-full text-center py-12" style={{ color: '#64748B' }}>
+                  <p>No modules found for this category.</p>
+                </div>
+              )}
             </div>
 
-            <p className="text-[10px] text-navy/40 text-center mt-6">
-              {t(
-                "Modules may be updated according to batch plan, faculty availability and training requirements.",
-                "Modules may be updated according to batch plan, faculty availability and training requirements."
-              )}
+            <p className="text-center text-sm mt-8" style={{ color: 'rgba(10, 22, 40, 0.4)' }}>
+              {t("Modules may be updated according to batch plan, faculty availability and training requirements.", "Modules may be updated according to batch plan, faculty availability and training requirements.")}
             </p>
           </div>
         </section>
 
         {/* Industrial Exposure */}
-        <section id="industrial" className="py-20 bg-white relative overflow-hidden">
-          <div className="absolute bottom-0 left-0 w-72 h-72 bg-gold/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-          <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-3 fade-up">
-              {t("Classroom से Industry तक", "From Classroom to Industry")}
-            </h2>
-            <p className="text-navy/60 text-sm text-center mb-10 max-w-2xl mx-auto">
-              {t(
-                "Students को production, purchase, quality, packing, dispatch, sales और industrial working environments का guided exposure मिल सकता है।",
-                "Students may receive guided exposure to production, purchase, quality, packing, dispatch, sales and industrial working environments."
-              )}
-            </p>
+        <section id="industrial" className="section" style={{ backgroundColor: '#F8F6F0' }}>
+          <div className="container">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <Building2 className="w-4 h-4" />
+                {t("औद्योगिक अनुभव", "Industrial Experience")}
+              </span>
+              <h2 className="text-section-title">{t("Classroom से Industry तक", "From Classroom to Industry")}</h2>
+              <p className="section-subtitle">
+                {t("Students को production, purchase, quality, packing, dispatch, sales और industrial working environments का guided exposure मिल सकता है।", "Students may receive guided exposure to production, purchase, quality, packing, dispatch, sales and industrial working environments.")}
+              </p>
+            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-              <div className="rounded-2xl overflow-hidden fade-up shadow-lg shadow-navy/5 hover:shadow-xl transition-shadow duration-300">
-                <img
-                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400"
-                  alt="Industrial factory"
-                  className="w-full h-32 md:h-44 object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+            <div className="gallery-grid fade-up">
+              <div className="gallery-item">
+                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800" alt="Industrial factory" loading="lazy" />
               </div>
-              <div className="rounded-2xl overflow-hidden fade-up shadow-lg shadow-navy/5 hover:shadow-xl transition-shadow duration-300">
-                <img
-                  src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=400"
-                  alt="Quality verification"
-                  className="w-full h-32 md:h-44 object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+              <div className="gallery-item">
+                <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=400" alt="Quality verification" loading="lazy" />
               </div>
-              <div className="rounded-2xl overflow-hidden fade-up shadow-lg shadow-navy/5 hover:shadow-xl transition-shadow duration-300">
-                <img
-                  src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=400"
-                  alt="Warehouse dispatch"
-                  className="w-full h-32 md:h-44 object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+              <div className="gallery-item">
+                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400" alt="Professional development" loading="lazy" />
               </div>
-              <div className="rounded-2xl overflow-hidden fade-up shadow-lg shadow-navy/5 hover:shadow-xl transition-shadow duration-300">
-                <img
-                  src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=400"
-                  alt="Professional development"
-                  className="w-full h-32 md:h-44 object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+              <div className="gallery-item">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=400" alt="Corporate team" loading="lazy" />
               </div>
-              <div className="rounded-2xl overflow-hidden fade-up shadow-lg shadow-navy/5 hover:shadow-xl transition-shadow duration-300">
-                <img
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=400"
-                  alt="Corporate team"
-                  className="w-full h-32 md:h-44 object-cover hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
+              <div className="gallery-item">
+                <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=400" alt="Warehouse dispatch" loading="lazy" />
               </div>
             </div>
 
-            <p className="text-[10px] text-navy/40 text-center">
-              {t(
-                "Industrial visits are subject to schedule, permissions, safety requirements and availability.",
-                "Industrial visits are subject to schedule, permissions, safety requirements and availability."
-              )}
+            <p className="text-center text-sm mt-8" style={{ color: 'rgba(10, 22, 40, 0.4)' }}>
+              {t("Industrial visits are subject to schedule, permissions, safety requirements and availability.", "Industrial visits are subject to schedule, permissions, safety requirements and availability.")}
             </p>
           </div>
         </section>
 
         {/* Student Journey */}
-        <section className="py-20 relative overflow-hidden">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="fade-up grid md:grid-cols-2 gap-10 items-center">
-              <div className="order-2 md:order-1">
-                <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl mb-4">
+        <section className="section" style={{ backgroundColor: 'white' }}>
+          <div className="container">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <div className="order-2 md:order-1 fade-up">
+                <h2 className="text-section-title mb-6">
                   {t("आपकी Journey: Student से Professional तक", "Your Journey: Student to Professional")}
                 </h2>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-gold font-bold text-xs">1</span>
+                <div className="space-y-6">
+                  {[
+                    { num: 1, titleHi: "Classroom Learning", titleEn: "Classroom Learning", descHi: "Structured modules से business fundamentals सीखें", descEn: "Learn business fundamentals through structured modules" },
+                    { num: 2, titleHi: "Practical Application", titleEn: "Practical Application", descHi: "Real business scenarios में hands-on practice", descEn: "Hands-on practice in real business scenarios" },
+                    { num: 3, titleHi: "Industrial Exposure", titleEn: "Industrial Exposure", descHi: "Real factory और office environments में visit", descEn: "Visits to real factory and office environments" },
+                    { num: 4, titleHi: "Career Ready", titleEn: "Career Ready", descHi: "Certificate के साथ job market के लिए तैयार", descEn: "Ready for the job market with certificate", highlight: true },
+                  ].map((item) => (
+                    <div key={item.num} className="flex items-start gap-4">
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${item.highlight ? 'bg-gold text-navy' : ''}`} style={{ backgroundColor: item.highlight ? '#C9A227' : 'rgba(201, 162, 39, 0.1)', color: item.highlight ? '#0A1628' : '#C9A227' }}>
+                        {item.highlight ? <Check className="w-6 h-6" /> : <span className="font-bold">{item.num}</span>}
+                      </div>
+                      <div>
+                        <h4 className="font-semibold mb-1" style={{ color: '#0A1628' }}>{t(item.titleHi, item.titleEn)}</h4>
+                        <p className="text-sm" style={{ color: '#64748B' }}>{t(item.descHi, item.descEn)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-navy">{t("Classroom Learning", "Classroom Learning")}</p>
-                      <p className="text-xs text-navy/60">
-                        {t("Structured modules से business fundamentals सीखें", "Learn business fundamentals through structured modules")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-gold font-bold text-xs">2</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-navy">{t("Practical Application", "Practical Application")}</p>
-                      <p className="text-xs text-navy/60">
-                        {t("Real business scenarios में hands-on practice", "Hands-on practice in real business scenarios")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-gold font-bold text-xs">3</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-navy">{t("Industrial Exposure", "Industrial Exposure")}</p>
-                      <p className="text-xs text-navy/60">
-                        {t("Real factory और office environments में visit", "Visits to real factory and office environments")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-navy" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-navy">{t("Career Ready", "Career Ready")}</p>
-                      <p className="text-xs text-navy/60">
-                        {t("Certificate के साथ job market के लिए तैयार", "Ready for the job market with certificate")}
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
-
-              <div className="order-1 md:order-2 rounded-3xl overflow-hidden shadow-2xl shadow-navy/10">
-                <img
-                  src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=600"
-                  alt="Student journey"
-                  className="w-full h-72 md:h-96 object-cover"
-                  loading="lazy"
-                />
+              <div className="order-1 md:order-2 fade-up delay-1">
+                <div className="img-premium" style={{ aspectRatio: '4/3' }}>
+                  <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800" alt="Student journey" loading="lazy" />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         {/* Who Can Apply */}
-        <section className="py-16 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-8 fade-up">
-              {t("कौन Apply कर सकता है?", "Who Can Apply?")}
-            </h2>
-            <div className="flex flex-wrap gap-3 justify-center mb-6">
-              {["BBA", "B.Com", "BA", "BCA", "B.Sc", "B.E./B.Tech", "MBA", "M.Com", "MA", "MSW", "M.Sc"].map((qual) => (
-                <span
-                  key={qual}
-                  className="bg-white border border-gold/20 rounded-full px-4 py-2 text-sm font-medium text-navy shadow-sm hover:shadow-md hover:border-gold/40 transition-all duration-300"
-                >
+        <section className="section-sm" style={{ backgroundColor: '#F8F6F0' }}>
+          <div className="container">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <Users className="w-4 h-4" />
+                {t("पात्रता", "Eligibility")}
+              </span>
+              <h2 className="text-section-title">{t("कौन Apply कर सकता है?", "Who Can Apply?")}</h2>
+            </div>
+
+            <div className="flex flex-wrap gap-3 justify-center mb-6 fade-up">
+              {["BBA", "B.Com", "BA", "BCA", "B.Sc", "B.E./B.Tech", "MBA", "M.Com", "MA", "MSW", "M.Sc", "Other Graduates"].map((qual) => (
+                <span key={qual} className="city-pill">
                   {qual}
                 </span>
               ))}
-              <span className="bg-white border border-gold/20 rounded-full px-4 py-2 text-sm font-medium text-navy shadow-sm hover:shadow-md hover:border-gold/40 transition-all duration-300">
-                {t("अन्य Graduates", "Other Graduates")}
-              </span>
             </div>
-            <p className="text-xs text-navy/50 text-center">
-              {t(
-                "Eligibility और batch suitability counselling के दौरान confirm की जाएगी।",
-                "Eligibility and batch suitability will be confirmed during counselling."
-              )}
+            <p className="text-center text-sm fade-up" style={{ color: 'rgba(10, 22, 40, 0.5)' }}>
+              {t("Eligibility और batch suitability counselling के दौरान confirm की जाएगी।", "Eligibility and batch suitability will be confirmed during counselling.")}
             </p>
           </div>
         </section>
 
         {/* Projects */}
-        <section id="projects" className="py-20 bg-navy relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: "radial-gradient(circle at 2px 2px, rgba(213,165,42,0.4) 1px, transparent 0)",
-              backgroundSize: "50px 50px",
-            }}
-          ></div>
-          <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <h2 className="font-heading font-bold text-white text-2xl md:text-3xl text-center mb-2 fade-up">
-              {t("Concept, Planning & Design Initiatives", "Concept, Planning & Design Initiatives")}
-            </h2>
-            <p className="text-white/50 text-xs text-center mb-10">
-              {t("10 Smart-City Project Concepts", "10 Smart-City Project Concepts")}
-            </p>
+        <section id="projects" className="section section-dark relative overflow-hidden">
+          <div className="bg-pattern-dots"></div>
+          <div className="container relative z-10">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <TrendingUp className="w-4 h-4" />
+                {t("प्रोजेक्ट्स", "Projects")}
+              </span>
+              <h2 className="text-section-title">{t("Concept, Planning & Design Initiatives", "Concept, Planning & Design Initiatives")}</h2>
+              <p className="section-subtitle">{t("10 Smart-City Project Concepts", "10 Smart-City Project Concepts")}</p>
+            </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {[
                 "Bus Rapid Transit System",
                 "River Travelling Project",
@@ -1117,51 +823,46 @@ export default function Home() {
                 "Street-Light Camera Project",
                 "Education Project",
               ].map((proj, idx) => (
-                <div
-                  key={proj}
-                  className="fade-up bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:bg-white/10 hover:border-gold/30 transition-all duration-300"
-                >
-                  <span className="text-gold font-heading font-bold text-xl">{(idx + 1).toString().padStart(2, "0")}</span>
-                  <p className="text-white text-sm">{proj}</p>
+                <div key={proj} className="card-dark rounded-2xl p-6 fade-up" style={{ animationDelay: `${idx * 0.05}s` }}>
+                  <span className="text-3xl font-bold" style={{ color: 'rgba(201, 162, 39, 0.3)' }}>{(idx + 1).toString().padStart(2, "0")}</span>
+                  <p className="text-white font-medium mt-2">{proj}</p>
                 </div>
               ))}
             </div>
 
-            <p className="text-[10px] text-white/30 text-center mt-6">
-              {t(
-                "These are concept and planning initiatives. They do not imply government approval, implementation or official partnership unless documentary proof is provided.",
-                "These are concept and planning initiatives. They do not imply government approval, implementation or official partnership unless documentary proof is provided."
-              )}
+            <p className="text-center text-sm mt-8" style={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+              {t("These are concept and planning initiatives. They do not imply government approval, implementation or official partnership unless documentary proof is provided.", "These are concept and planning initiatives. They do not imply government approval, implementation or official partnership unless documentary proof is provided.")}
             </p>
           </div>
         </section>
 
         {/* Organization Divisions */}
-        <section className="py-20">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-8 fade-up">
-              {t("Organization Divisions", "Organization Divisions")}
-            </h2>
+        <section className="section" style={{ backgroundColor: 'white' }}>
+          <div className="container-sm">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <Building2 className="w-4 h-4" />
+                {t("संगठन विभाग", "Organization")}
+              </span>
+              <h2 className="text-section-title">{t("Organization Divisions", "Organization Divisions")}</h2>
+            </div>
 
-            <div className="space-y-3" id="divisions-accordion">
+            <div className="space-y-4 fade-up">
               {divisions.map((div, idx) => {
                 const isOpen = !!openDivisions[idx];
                 return (
-                  <div
-                    key={idx}
-                    className="acc-item border border-navy/10 rounded-2xl overflow-hidden hover:border-gold/20 transition-colors duration-300"
-                  >
+                  <div key={idx} className="accordion-item">
                     <button
                       onClick={() => setOpenDivisions((prev) => ({ ...prev, [idx]: !prev[idx] }))}
-                      className="acc-btn w-full text-left px-5 py-4 font-heading font-semibold text-sm text-navy flex justify-between items-center"
+                      className="accordion-trigger w-full"
                     >
-                      {div.title}
-                      <ChevronDown className="w-4 h-4 transition-transform duration-300" style={{ transform: isOpen ? "rotate(180deg)" : "" }} />
+                      <span>{div.title}</span>
+                      <span className="accordion-icon">
+                        <ChevronDown className="w-5 h-5" />
+                      </span>
                     </button>
                     <div className={`accordion-content ${isOpen ? "open" : ""}`}>
-                      <div className="px-5 pb-4">
-                        <p className="text-xs text-navy/60">{t(div.contentHi, div.contentEn)}</p>
-                      </div>
+                      <div className="accordion-body">{t(div.contentHi, div.contentEn)}</div>
                     </div>
                   </div>
                 );
@@ -1171,117 +872,61 @@ export default function Home() {
         </section>
 
         {/* Expansion Vision */}
-        <section className="py-16 bg-white">
-          <div className="max-w-5xl mx-auto px-4 text-center">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl mb-3 fade-up">
-              {t("भारत के 25+ शहरों तक पहुँचने का विज़न", "Vision to Reach 25+ Cities Across India")}
-            </h2>
-            <p className="text-navy/60 text-sm mb-8">
-              {t("Indore (Head Office) से विस्तार का लक्ष्य", "Expansion target from Indore (Head Office)")}
-            </p>
-
-            <div className="flex flex-wrap gap-2 justify-center mb-6">
-              <span className="bg-gold/15 text-navy text-xs font-bold px-3 py-1.5 rounded-full border border-gold/30 shadow-sm">
-                Indore ★
+        <section className="section-sm" style={{ backgroundColor: '#F8F6F0' }}>
+          <div className="container">
+            <div className="text-center fade-up">
+              <span className="section-overline">
+                <MapPin className="w-4 h-4" />
+                {t("हमारा विज़न", "Our Vision")}
               </span>
-              {[
-                "Bhopal",
-                "Jabalpur",
-                "Gwalior",
-                "Raipur",
-                "Jaipur",
-                "Kota",
-                "Surat",
-                "Vadodara",
-                "Pune",
-                "Nagpur",
-                "Lucknow",
-                "Kanpur",
-                "Kolkata",
-                "Chennai",
-                "Hyderabad",
-                "Patna",
-                "Jammu",
-              ].map((city) => (
-                <span key={city} className="bg-navy/5 text-navy text-xs px-3 py-1.5 rounded-full hover:bg-navy/10 transition">
-                  {city}
-                </span>
-              ))}
-            </div>
+              <h2 className="text-section-title mb-4">{t("भारत के 25+ शहरों तक पहुँचने का विज़न", "Vision to Reach 25+ Cities Across India")}</h2>
+              <p className="section-subtitle mb-8">
+                {t("Indore (Head Office) से विस्तार का लक्ष्य", "Expansion target from Indore (Head Office)")}
+              </p>
 
-            <p className="text-[10px] text-navy/40">
-              {t(
-                "Locations shown represent a proposed expansion vision and not necessarily operational branches.",
-                "Locations shown represent a proposed expansion vision and not necessarily operational branches."
-              )}
-            </p>
+              <div className="flex flex-wrap gap-3 justify-center mb-6">
+                <span className="city-pill city-pill-head">
+                  <MapPin className="w-4 h-4" /> Indore ★
+                </span>
+                {["Bhopal", "Jabalpur", "Gwalior", "Raipur", "Jaipur", "Kota", "Surat", "Vadodara", "Pune", "Nagpur", "Lucknow", "Kanpur", "Kolkata", "Chennai", "Hyderabad", "Patna", "Jammu"].map((city) => (
+                  <span key={city} className="city-pill">{city}</span>
+                ))}
+              </div>
+
+              <p className="text-sm" style={{ color: 'rgba(10, 22, 40, 0.4)' }}>
+                {t("Locations shown represent a proposed expansion vision and not necessarily operational branches.", "Locations shown represent a proposed expansion vision and not necessarily operational branches.")}
+              </p>
+            </div>
           </div>
         </section>
 
         {/* Admissions */}
-        <section id="admissions" className="py-20 relative">
-          <div className="max-w-5xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-12 fade-up">
-              {t("Admission Process", "Admission Process")}
-            </h2>
+        <section id="admissions" className="section" style={{ backgroundColor: 'white' }}>
+          <div className="container">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <Clock className="w-4 h-4" />
+                {t("प्रवेश प्रक्रिया", "Admissions")}
+              </span>
+              <h2 className="text-section-title">{t("Admission Process", "Admission Process")}</h2>
+              <p className="section-subtitle">
+                {t("Simple steps to start your journey", "Simple steps to start your journey")}
+              </p>
+            </div>
 
-            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8" id="admission-steps-container">
+            <div className="grid md:grid-cols-3 gap-8">
               {[
-                {
-                  step: 1,
-                  titleHi: "पूछताछ सबमिट करें",
-                  titleEn: "Submit Enquiry",
-                  descHi: "ऑनलाइन फॉर्म भरें या सीधे हमसे संपर्क करें।",
-                  descEn: "Fill out the online form or contact us directly.",
-                },
-                {
-                  step: 2,
-                  titleHi: "परामर्श और पात्रता",
-                  titleEn: "Counselling & Eligibility",
-                  descHi: "हमारे काउंसलर से बात करें और अपनी योग्यता की जांच करें।",
-                  descEn: "Speak with our counsellor and verify your eligibility.",
-                },
-                {
-                  step: 3,
-                  titleHi: "बैच और फीस की पुष्टि",
-                  titleEn: "Batch & Fee Confirmation",
-                  descHi: "अपने पसंदीदा बैच समय और फीस विवरण की पुष्टि करें।",
-                  descEn: "Confirm your preferred batch timing and fee details.",
-                },
-                {
-                  step: 4,
-                  titleHi: "दस्तावेज़ जमा करना",
-                  titleEn: "Document Submission",
-                  descHi: "प्रवेश के लिए आवश्यक शैक्षणिक दस्तावेज जमा करें।",
-                  descEn: "Submit the required academic documents for admission.",
-                },
-                {
-                  step: 5,
-                  titleHi: "प्रवेश की पुष्टि",
-                  titleEn: "Admission Confirmation",
-                  descHi: "संस्थान द्वारा आपके प्रवेश की अंतिम पुष्टि प्राप्त करें।",
-                  descEn: "Get the final confirmation of your admission from the institute.",
-                },
-                {
-                  step: 6,
-                  titleHi: "प्रशिक्षण (Training) शुरू",
-                  titleEn: "Training Commences",
-                  descHi: "अपना 45-दिवसीय प्रशिक्षण और इंटर्नशिप प्रोग्राम शुरू करें।",
-                  descEn: "Start your 45-day training and internship program.",
-                },
-              ].map((stepObj) => (
-                <div
-                  key={stepObj.step}
-                  className="admission-step relative flex flex-col gap-2 p-6 bg-white border border-gold/10 rounded-2xl transition-all duration-500 opacity-60 scale-95 shadow-sm"
-                  data-step={stepObj.step}
-                >
-                  <span className="step-badge absolute -top-4 left-6 w-8 h-8 rounded-full bg-white border-2 border-navy/20 flex items-center justify-center font-heading font-bold text-xs text-navy/60 transition-all duration-300 z-10">
-                    {stepObj.step}
-                  </span>
-                  <div className="mt-2">
-                    <h4 className="text-sm font-bold text-navy mb-1">{t(stepObj.titleHi, stepObj.titleEn)}</h4>
-                    <p className="text-xs text-navy/60">{t(stepObj.descHi, stepObj.descEn)}</p>
-                  </div>
+                { step: 1, titleHi: "पूछताछ सबमिट करें", titleEn: "Submit Enquiry", descHi: "ऑनलाइन फॉर्म भरें या सीधे हमसे संपर्क करें।", descEn: "Fill out the online form or contact us directly." },
+                { step: 2, titleHi: "परामर्श और पात्रता", titleEn: "Counselling & Eligibility", descHi: "हमारे काउंसलर से बात करें और अपनी योग्यता की जांच करें।", descEn: "Speak with our counsellor and verify your eligibility." },
+                { step: 3, titleHi: "बैच और फीस की पुष्टि", titleEn: "Batch & Fee Confirmation", descHi: "अपने पसंदीदा बैच समय और फीस विवरण की पुष्टि करें।", descEn: "Confirm your preferred batch timing and fee details." },
+                { step: 4, titleHi: "दस्तावेज़ जमा करना", titleEn: "Document Submission", descHi: "प्रवेश के लिए आवश्यक शैक्षणिक दस्तावेज जमा करें।", descEn: "Submit the required academic documents for admission." },
+                { step: 5, titleHi: "प्रवेश की पुष्टि", titleEn: "Admission Confirmation", descHi: "संस्थान द्वारा आपके प्रवेश की अंतिम पुष्टि प्राप्त करें।", descEn: "Get the final confirmation of your admission from the institute." },
+                { step: 6, titleHi: "प्रशिक्षण शुरू", titleEn: "Training Commences", descHi: "अपना 45-दिवसीय प्रशिक्षण और इंटर्नशिप प्रोग्राम शुरू करें।", descEn: "Start your 45-day training and internship program." },
+              ].map((item, idx) => (
+                <div key={item.step} className="step-card fade-up" style={{ animationDelay: `${idx * 0.1}s` }}>
+                  <div className="step-number">{item.step}</div>
+                  <h4 className="font-semibold mt-2 mb-2" style={{ color: '#0A1628' }}>{t(item.titleHi, item.titleEn)}</h4>
+                  <p className="text-sm" style={{ color: '#64748B' }}>{t(item.descHi, item.descEn)}</p>
                 </div>
               ))}
             </div>
@@ -1289,31 +934,32 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
-        <section className="py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="font-heading font-bold text-navy text-2xl md:text-3xl text-center mb-10 fade-up">
-              {t("अक्सर पूछे जाने वाले प्रश्न", "Frequently Asked Questions")}
-            </h2>
+        <section className="section" style={{ backgroundColor: '#F8F6F0' }}>
+          <div className="container-sm">
+            <div className="section-header fade-up">
+              <span className="section-overline">
+                <BookOpen className="w-4 h-4" />
+                {t("सहायता", "Help")}
+              </span>
+              <h2 className="text-section-title">{t("अक्सर पूछे जाने वाले प्रश्न", "Frequently Asked Questions")}</h2>
+            </div>
 
-            <div className="space-y-3" id="faq-accordion">
+            <div className="space-y-4 fade-up">
               {faqs.map((faq, idx) => {
                 const isOpen = !!openFaqs[idx];
                 return (
-                  <div
-                    key={idx}
-                    className="acc-item border border-navy/10 rounded-2xl overflow-hidden hover:border-gold/20 transition-colors"
-                  >
+                  <div key={idx} className="accordion-item">
                     <button
                       onClick={() => setOpenFaqs((prev) => ({ ...prev, [idx]: !prev[idx] }))}
-                      className="acc-btn w-full text-left px-5 py-4 font-semibold text-sm text-navy flex justify-between items-center"
+                      className="accordion-trigger w-full"
                     >
                       <span>{t(faq.qHi, faq.qEn)}</span>
-                      <ChevronDown className="w-4 h-4 transition-transform duration-300" style={{ transform: isOpen ? "rotate(180deg)" : "" }} />
+                      <span className="accordion-icon">
+                        <ChevronDown className="w-5 h-5" />
+                      </span>
                     </button>
                     <div className={`accordion-content ${isOpen ? "open" : ""}`}>
-                      <div className="px-5 pb-4">
-                        <p className="text-xs text-navy/60">{t(faq.aHi, faq.aEn)}</p>
-                      </div>
+                      <div className="accordion-body">{t(faq.aHi, faq.aEn)}</div>
                     </div>
                   </div>
                 );
@@ -1323,35 +969,21 @@ export default function Home() {
         </section>
 
         {/* Final CTA */}
-        <section className="py-24 bg-navy relative overflow-hidden">
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{ background: "radial-gradient(ellipse at center, rgba(213,165,42,0.3) 0%, transparent 70%)" }}
-          ></div>
-          <div className="relative z-10 max-w-3xl mx-auto px-4 text-center">
-            <h2 className="font-hindi font-bold text-white text-2xl md:text-3xl mb-6">
+        <section className="section-lg section-dark relative overflow-hidden">
+          <div className="bg-pattern-grid"></div>
+          <div className="relative z-10 max-w-3xl mx-auto text-center">
+            <h2 className="text-section-title mb-6 fade-up">
               {t("क्या आप अपने करियर की शुरुआत करने के लिए तैयार हैं?", "Ready to Start Your Career Journey?")}
             </h2>
 
-            <div className="flex flex-wrap gap-4 justify-center">
-              <button
-                onClick={() => setEnquiryModalOpen(true)}
-                className="bg-gold text-navy font-heading font-bold px-7 py-3.5 rounded-full text-sm hover:bg-yellow-400 transition-all duration-300 gold-glow shadow-lg"
-              >
-                {t("Apply for Admission", "Apply for Admission")}
+            <div className="flex flex-wrap gap-4 justify-center fade-up delay-1">
+              <button onClick={() => setEnquiryModalOpen(true)} className="btn btn-primary btn-lg">
+                {t("Apply for Admission", "Apply for Admission")} <ArrowRight className="w-5 h-5" />
               </button>
-              <a
-                href="https://wa.me/919826444482"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-2 border-white text-white font-heading font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-white hover:text-navy transition-all duration-300"
-              >
+              <a href="https://wa.me/919826444482" target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-lg">
                 {t("WhatsApp पर बात करें", "Chat on WhatsApp")}
               </a>
-              <a
-                href="tel:+919826444482"
-                className="border-2 border-gold text-gold font-heading font-semibold px-7 py-3.5 rounded-full text-sm hover:bg-gold hover:text-navy transition-all duration-300"
-              >
+              <a href="tel:+919826444482" className="btn btn-lg" style={{ backgroundColor: 'rgba(201, 162, 39, 0.15)', color: '#C9A227', border: '2px solid rgba(201, 162, 39, 0.4)' }}>
                 {t("Call Counsellor", "Call Counsellor")}
               </a>
             </div>
@@ -1359,295 +991,207 @@ export default function Home() {
         </section>
 
         {/* Contact */}
-        <section id="contact" className="py-20">
-          <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12">
-            <div className="fade-up">
-              <h2 className="font-heading font-bold text-navy text-2xl mb-4">{t("संपर्क करें", "Contact Us")}</h2>
-              <div className="space-y-3 text-sm text-navy/75">
-                <p>
-                  <strong>IGPSO Internship &amp; Business Training College</strong>
-                  <br />
-                  Plot No. 13/B, Sector-B, Industrial Area, Sanwer Road,
-                  <br />
-                  Near International Rubber Industries,
-                  <br />
-                  Indore, Madhya Pradesh – 452015
-                </p>
-                <p className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5" />
-                  <a href="tel:+919826444482">98264-44482</a> | <a href="tel:+919407413082">94074-13082</a>
-                </p>
-                <p className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5" />
-                  igpso2017@yahoo.com
-                </p>
-                <p className="flex items-center gap-2">
-                  <Globe className="w-3.5 h-3.5" />
-                  www.igpso.com
-                </p>
+        <section id="contact" className="section" style={{ backgroundColor: 'white' }}>
+          <div className="container">
+            <div className="grid md:grid-cols-2 gap-16">
+              <div className="fade-up">
+                <span className="section-overline">
+                  <Phone className="w-4 h-4" />
+                  {t("संपर्क", "Contact")}
+                </span>
+                <h2 className="text-section-title mb-6">{t("संपर्क करें", "Contact Us")}</h2>
+                
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)' }}>
+                      <Building2 className="w-5 h-5" style={{ color: '#C9A227' }} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1" style={{ color: '#0A1628' }}>IGPSO Internship & Business Training College</h4>
+                      <p className="text-sm" style={{ color: '#64748B' }}>
+                        Plot No. 13/B, Sector-B, Industrial Area, Sanwer Road,
+                        <br />Near International Rubber Industries,
+                        <br />Indore, Madhya Pradesh – 452015
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)' }}>
+                      <Phone className="w-5 h-5" style={{ color: '#C9A227' }} />
+                    </div>
+                    <div>
+                      <p className="text-sm" style={{ color: '#64748B' }}>
+                        <a href="tel:+919826444482" className="hover:text-gold transition">98264-44482</a> | <a href="tel:+919407413082" className="hover:text-gold transition">94074-13082</a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)' }}>
+                      <Mail className="w-5 h-5" style={{ color: '#C9A227' }} />
+                    </div>
+                    <div>
+                      <p className="text-sm" style={{ color: '#64748B' }}>igpso2017@yahoo.com</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl h-56 flex items-center justify-center" style={{ backgroundColor: 'rgba(10, 22, 40, 0.03)', border: '1px solid rgba(10, 22, 40, 0.1)' }}>
+                  <p className="text-sm" style={{ color: 'rgba(10, 22, 40, 0.4)' }}>{t("Google Map Placeholder", "Google Map Placeholder")}</p>
+                </div>
               </div>
 
-              <div className="mt-6 bg-navy/5 rounded-2xl h-48 flex items-center justify-center text-navy/30 text-sm border border-navy/10">
-                {t("Google Map Placeholder", "Google Map Placeholder")}
+              <div className="fade-up delay-1">
+                <h3 className="text-card-title mb-6">{t("Quick Message", "Quick Message")}</h3>
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <input type="text" required placeholder="Name" value={contactForm.name} onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })} className="input" />
+                  <input type="tel" required placeholder="Mobile" value={contactForm.mobile} onChange={(e) => setContactForm({ ...contactForm, mobile: e.target.value })} className="input" />
+                  <input type="email" placeholder="Email" value={contactForm.email} onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })} className="input" />
+                  <textarea rows={4} placeholder="Message" value={contactForm.message} onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })} className="input textarea"></textarea>
+                  <button type="submit" className="btn btn-primary w-full">
+                    {t("Send Message", "Send Message")} <Send className="w-4 h-4" />
+                  </button>
+                </form>
               </div>
-            </div>
-
-            <div className="fade-up">
-              <h3 className="font-heading font-bold text-navy text-lg mb-4">{t("Quick Message", "Quick Message")}</h3>
-              <form onSubmit={handleContactSubmit} className="grid gap-3">
-                <input
-                  type="text"
-                  required
-                  placeholder="Name"
-                  value={contactForm.name}
-                  onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold focus:border-gold outline-none transition"
-                />
-                <input
-                  type="tel"
-                  required
-                  placeholder="Mobile"
-                  value={contactForm.mobile}
-                  onChange={(e) => setContactForm({ ...contactForm, mobile: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold focus:border-gold outline-none transition"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold focus:border-gold outline-none transition"
-                />
-                <textarea
-                  rows={3}
-                  placeholder="Message"
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold focus:border-gold outline-none resize-none transition"
-                ></textarea>
-                <button
-                  type="submit"
-                  className="w-full bg-navy text-white font-heading font-bold py-3 rounded-xl hover:bg-royal transition-all duration-300 text-sm"
-                >
-                  {t("Send Message", "Send Message")}
-                </button>
-              </form>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-navy text-white py-12">
-        <div className="max-w-6xl mx-auto px-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-full bg-gold flex items-center justify-center font-heading font-bold text-navy text-xs">
-                IG
-              </div>
-              <span className="font-heading font-bold text-sm">IGPSO</span>
+      {/* Premium Footer */}
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <a href="#home" className="logo">
+                <div className="logo-icon">IG</div>
+                <span className="logo-text">IGPSO</span>
+              </a>
+              <p className="mt-4">
+                International Government & Public Supportive Organization
+                <br />Registration No. C/1077232
+              </p>
             </div>
-            <p className="text-xs text-white/60 leading-relaxed">
-              International Government &amp; Public Supportive Organization
-              <br />
-              Reg. No. C/1077232
+
+            <div>
+              <h4 className="footer-title">{t("Quick Links", "Quick Links")}</h4>
+              <ul className="footer-links">
+                <li><a href="#about">{t("About", "About")}</a></li>
+                <li><a href="#program">{t("45-Day Program", "45-Day Program")}</a></li>
+                <li><a href="#modules">{t("Modules", "Modules")}</a></li>
+                <li><a href="#admissions">{t("Admissions", "Admissions")}</a></li>
+                <li><a href="#contact">{t("Contact", "Contact")}</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="footer-title">{t("Program", "Program")}</h4>
+              <ul className="footer-links">
+                <li><a href="#program">{t("Business Training", "Business Training")}</a></li>
+                <li><a href="#industrial">{t("Industrial Exposure", "Industrial Exposure")}</a></li>
+                <li><a href="#admissions">{t("Internship Certificate", "Internship Certificate")}</a></li>
+                <li><a href="#contact">{t("Career Guidance", "Career Guidance")}</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="footer-title">{t("Contact", "Contact")}</h4>
+              <ul className="footer-links">
+                <li>98264-44482</li>
+                <li>94074-13082</li>
+                <li>igpso2017@yahoo.com</li>
+                <li>Indore, MP – 452015</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="footer-bottom">
+            <p className="mb-2">
+              <a href="#" className="hover:text-gold transition mx-2">Privacy Policy</a> |
+              <a href="#" className="hover:text-gold transition mx-2">Terms & Conditions</a> |
+              <a href="#" className="hover:text-gold transition mx-2">Admission & Refund Policy</a> |
+              <a href="#" className="hover:text-gold transition mx-2">Disclaimer</a>
             </p>
-          </div>
-
-          <div>
-            <h4 className="font-heading font-bold text-sm mb-3 text-gold">Quick Links</h4>
-            <ul className="space-y-1 text-xs text-white/60">
-              <li>
-                <a href="#about" className="hover:text-gold transition">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#program" className="hover:text-gold transition">
-                  45-Day Program
-                </a>
-              </li>
-              <li>
-                <a href="#modules" className="hover:text-gold transition">
-                  Modules
-                </a>
-              </li>
-              <li>
-                <a href="#admissions" className="hover:text-gold transition">
-                  Admissions
-                </a>
-              </li>
-              <li>
-                <a href="#contact" className="hover:text-gold transition">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-heading font-bold text-sm mb-3 text-gold">Program</h4>
-            <ul className="space-y-1 text-xs text-white/60">
-              <li>Business Training</li>
-              <li>Industrial Exposure</li>
-              <li>Internship Certificate</li>
-              <li>Career Guidance</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-heading font-bold text-sm mb-3 text-gold">Contact</h4>
-            <p className="text-xs text-white/60">
-              98264-44482
-              <br />
-              94074-13082
-              <br />
-              igpso2017@yahoo.com
-              <br />
-              Indore, MP – 452015
+            <p className="footer-copyright">
+              {t("Training outcomes vary according to attendance, participation, skills and individual performance. Employment or income is not guaranteed.", "Training outcomes vary according to attendance, participation, skills and individual performance. Employment or income is not guaranteed.")}
             </p>
+            <p className="footer-copyright mt-2">© 2026 IGPSO. All Rights Reserved.</p>
           </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 mt-8 pt-6 border-t border-white/10 text-[10px] text-white/40 text-center space-y-1">
-          <p>Privacy Policy | Terms &amp; Conditions | Admission &amp; Refund Policy | Disclaimer</p>
-          <p>
-            {t(
-              "Training outcomes vary according to attendance, participation, skills and individual performance. Employment or income is not guaranteed.",
-              "Training outcomes vary according to attendance, participation, skills and individual performance. Employment or income is not guaranteed."
-            )}
-          </p>
-          <p>© 2026 IGPSO. All Rights Reserved.</p>
         </div>
       </footer>
 
       {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/919826444482"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="whatsapp-float"
-        aria-label="Chat on WhatsApp"
-      >
+      <a href="https://wa.me/919826444482" target="_blank" rel="noopener noreferrer" className="whatsapp-float" aria-label="Chat on WhatsApp">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
         </svg>
       </a>
 
       {/* Floating Enquiry Button */}
-      <button
-        onClick={() => setEnquiryModalOpen(true)}
-        className="fixed bottom-24 right-6 z-50 bg-gold text-navy font-heading font-bold text-xs md:text-sm px-5 py-3 rounded-full shadow-lg hover:bg-yellow-400 transition-all duration-300 flex items-center gap-2 border border-gold/20 gold-glow"
-      >
-        <Edit3 className="w-4 h-4" />
-        <span>{t("त्वरित Enquiry", "Quick Enquiry")}</span>
-      </button>
+      <div className="enquiry-float">
+        <button
+          onClick={() => setEnquiryModalOpen(true)}
+          className="btn btn-primary shadow-gold"
+        >
+          <Edit3 className="w-4 h-4" />
+          <span>{t("त्वरित Enquiry", "Quick Enquiry")}</span>
+        </button>
+      </div>
 
       {/* Quick Enquiry Modal */}
       {enquiryModalOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-          <div onClick={() => setEnquiryModalOpen(false)} className="absolute inset-0 bg-navy/60 backdrop-blur-md"></div>
-          <div className="relative glass-card rounded-3xl p-6 md:p-8 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto z-10 text-navy">
-            <button onClick={() => setEnquiryModalOpen(false)} className="absolute top-4 right-4 text-navy/60 hover:text-navy transition" aria-label="Close modal">
-              <X className="w-6 h-6" />
+        <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <div onClick={() => setEnquiryModalOpen(false)} className="absolute inset-0"></div>
+          <div className="modal-content">
+            <button onClick={() => setEnquiryModalOpen(false)} className="modal-close" aria-label="Close modal">
+              <X className="w-5 h-5" />
             </button>
-            <h2 id="modal-title" className="font-heading font-bold text-navy text-xl mb-1">
-              {t("त्वरित पूछताछ", "Quick Enquiry")}
-            </h2>
-            <p className="text-sm text-navy/60 mb-4">{t("हम आपसे जल्द संपर्क करेंगे", "We'll get back to you soon")}</p>
+            <h2 id="modal-title" className="text-section-title mb-2">{t("त्वरित पूछताछ", "Quick Enquiry")}</h2>
+            <p className="mb-6" style={{ color: '#64748B' }}>{t("हम आपसे जल्द संपर्क करेंगे", "We'll get back to you soon")}</p>
 
-            <form onSubmit={handleModalSubmit} className={`grid gap-3 ${modalSubmitStatus === "success" ? "hidden" : ""}`}>
-              <input
-                type="text"
-                required
-                placeholder="Full Name / पूरा नाम"
-                value={modalForm.name}
-                onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
-                className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none bg-white text-navy"
-              />
-              <input
-                type="tel"
-                required
-                placeholder="Mobile Number"
-                value={modalForm.mobile}
-                onChange={(e) => setModalForm({ ...modalForm, mobile: e.target.value })}
-                className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none bg-white text-navy"
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="City / शहर"
-                  value={modalForm.city}
-                  onChange={(e) => setModalForm({ ...modalForm, city: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none bg-white text-navy"
-                />
-                <select
-                  value={modalForm.qual}
-                  onChange={(e) => setModalForm({ ...modalForm, qual: e.target.value })}
-                  className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none bg-white text-navy"
-                >
-                  <option value="">Qualification</option>
-                  {["BBA", "B.Com", "BA", "BCA", "B.Sc", "B.E./B.Tech", "MBA", "M.Com", "MA", "MSW", "M.Sc", "Other"].map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
+            {modalSubmitStatus !== "success" ? (
+              <form onSubmit={handleModalSubmit} className="space-y-4">
+                <input type="text" required placeholder="Full Name / पूरा नाम" value={modalForm.name} onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })} className="input" />
+                <input type="tel" required placeholder="Mobile Number" value={modalForm.mobile} onChange={(e) => setModalForm({ ...modalForm, mobile: e.target.value })} className="input" />
+                <div className="grid grid-cols-2 gap-4">
+                  <input type="text" placeholder="City / शहर" value={modalForm.city} onChange={(e) => setModalForm({ ...modalForm, city: e.target.value })} className="input" />
+                  <select value={modalForm.qual} onChange={(e) => setModalForm({ ...modalForm, qual: e.target.value })} className="input select">
+                    <option value="">Qualification</option>
+                    {["BBA", "B.Com", "BA", "BCA", "B.Sc", "B.E./B.Tech", "MBA", "M.Com", "MA", "MSW", "M.Sc", "Other"].map((o) => (
+                      <option key={o} value={o}>{o}</option>
+                    ))}
+                  </select>
+                </div>
+                <select value={modalForm.batch} onChange={(e) => setModalForm({ ...modalForm, batch: e.target.value })} className="input select">
+                  <option value="">Preferred Batch</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Weekend">Weekend</option>
                 </select>
-              </div>
-
-              <select
-                value={modalForm.batch}
-                onChange={(e) => setModalForm({ ...modalForm, batch: e.target.value })}
-                className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none bg-white text-navy"
-              >
-                <option value="">Preferred Batch</option>
-                <option value="Morning">Morning</option>
-                <option value="Afternoon">Afternoon</option>
-                <option value="Weekend">Weekend</option>
-              </select>
-
-              <textarea
-                rows={2}
-                placeholder="Message (optional)"
-                value={modalForm.msg}
-                onChange={(e) => setModalForm({ ...modalForm, msg: e.target.value })}
-                className="w-full border border-navy/15 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-gold outline-none resize-none bg-white text-navy"
-              ></textarea>
-
-              <label className="flex items-start gap-2 text-xs text-navy/70">
-                <input
-                  type="checkbox"
-                  required
-                  checked={modalForm.consent}
-                  onChange={(e) => setModalForm({ ...modalForm, consent: e.target.checked })}
-                  className="mt-0.5"
-                />
-                <span>{t("मैं IGPSO को मुझसे संपर्क करने की अनुमति देता/देती हूँ।", "I consent to IGPSO contacting me.")}</span>
-              </label>
-
-              <button
-                type="submit"
-                disabled={modalSubmitStatus === "loading"}
-                className="w-full bg-gold text-navy font-heading font-bold py-3 rounded-xl hover:bg-yellow-400 transition text-sm disabled:opacity-50"
-              >
-                {modalSubmitStatus === "loading" ? "..." : t("कॉल बैक का अनुरोध करें", "Request a Callback")}
-              </button>
-            </form>
-
-            {modalSubmitStatus === "success" && (
-              <div className="text-center py-4">
-                <p className="text-success font-semibold">
+                <textarea rows={2} placeholder="Message (optional)" value={modalForm.msg} onChange={(e) => setModalForm({ ...modalForm, msg: e.target.value })} className="input textarea"></textarea>
+                <label className="flex items-start gap-3 text-sm" style={{ color: '#64748B' }}>
+                  <input type="checkbox" required checked={modalForm.consent} onChange={(e) => setModalForm({ ...modalForm, consent: e.target.checked })} className="mt-1" />
+                  <span>{t("मैं IGPSO को मुझसे संपर्क करने की अनुमति देता/देती हूँ।", "I consent to IGPSO contacting me.")}</span>
+                </label>
+                <button type="submit" disabled={modalSubmitStatus === "loading"} className="btn btn-primary w-full">
+                  {modalSubmitStatus === "loading" ? "..." : t("कॉल बैक का अनुरोध करें", "Request a Callback")}
+                </button>
+              </form>
+            ) : (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)' }}>
+                  <Check className="w-8 h-8" style={{ color: '#22C55E' }} />
+                </div>
+                <p className="font-semibold text-lg" style={{ color: '#22C55E' }}>
                   {t("✓ आपकी enquiry सफलतापूर्वक भेजी गई!", "✓ Your enquiry has been submitted!")}
                 </p>
               </div>
             )}
 
             {modalSubmitStatus === "error" && (
-              <div className="text-center py-2">
-                <p className="text-red-600 text-sm">
-                  {t("कुछ गड़बड़ हुई, कृपया पुनः प्रयास करें।", "Something went wrong. Please try again.")}
-                </p>
+              <div className="text-center py-4">
+                <p style={{ color: '#EF4444' }}>{t("कुछ गड़बड़ हुई, कृपया पुनः प्रयास करें।", "Something went wrong. Please try again.")}</p>
               </div>
             )}
           </div>
